@@ -1,0 +1,24 @@
+{
+  "name": "ecommerce-back",
+  "version": "1.0.0",
+  "description": "backend of ecommerce",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunkarasairam18/ecommerce-back.git"
+  },
+  "author": "Sai Ram Sunkara",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sunkarasairam18/ecommerce-back/issues"
+  },
+  "homepage": "https://github.com/sunkarasairam18/ecommerce-back#readme",
+  "dependencies": {
+    "config": "^3.3.7",
+    "express": "^4.17.2",
+    "mongoose": "^6.1.8"
+  }
+}
