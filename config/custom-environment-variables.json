@@ -1,4 +1,5 @@
 {
+    "auth_jwtPrivateKey": "e_jwtPrivateKey",
     "db":{
         "username":"e_db_username",
         "password":"e_db_password"
