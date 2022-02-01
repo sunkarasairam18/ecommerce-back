@@ -5,15 +5,10 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    firstName:{
+    fullName:{
         type: String,
         required: true,
         trim: true        
-    },
-    lastName:{
-        type: String,
-        required: true,
-        trim: true
     },
     userName: {
         type: String,
@@ -60,8 +55,7 @@ userSchema.methods.Authenticate = async function(password){
 
 const validateUser = (body)=>{
     const schema = Joi.object({
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        fullName: Joi.string().required(),
         userName: Joi.string().required(),
         email: Joi.string().email().required(),
         password: Joi.string().min(8).required(),
