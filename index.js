@@ -1,4 +1,5 @@
-const authRouter = require("./routes/auth");
+const {authRouter} = require("./routes/auth");
+const {categoryRouter} = require("./routes/category"); 
 const express = require('express');
 const connectDb = require('./connection');
 const app = express();
@@ -6,6 +7,7 @@ const app = express();
 app.use(express.json());
 connectDb();
 
+app.use("/category",categoryRouter);
 app.use("/user",authRouter);
 
 app.get("/",(req,res)=>{

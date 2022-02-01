@@ -26,6 +26,8 @@ router.post('/login',async (req,res)=>{
         }else{
             return res.status(400).send("Invalid Email or password");  //The request could not be understood by the server due to malformed syntax
         }
+    }else{
+        return res.status(400).send("Invalid Email or password");  //The request could not be understood by the server due to malformed syntax
     }
 });
 
@@ -74,4 +76,4 @@ router.get('/list',[auth,admin],(req,res)=>{
 
 
 
-module.exports = router;
+module.exports.authRouter = router;
