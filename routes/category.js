@@ -1,9 +1,32 @@
 const {Category} = require("../models/category");
+const {auth} = require("../middleware/auth");
+const {admin} = require("../middleware/admin");
 const slugify = require('slugify');
 const express = require("express");
 const router = express.Router();
 
-router.post('/create',(req,res)=>{
+function createCategories(categories,parentId = null){
+    const categoryList = [];
+    let category;
+    if(parentId == null){
+        category = categories.filter(cat => cat.parentId == undefined);
+    }else category = categories.filter(cat => cat.parentId == parentId);
+
+    for(let cat of category){
+        categoryList.push(
+            {
+                _id: cat._id,
+                name: cat.name,
+                slug: cat.slug,
+                children: createCategories(categories,cat._id)
+            }
+        );
+    }
+        
+    return categoryList;
+}
+
+router.post('/create',[auth,admin],async (req,res)=>{
     const categoryObj = {
         name: req.body.name,
         slug: slugify(req.body.name)
@@ -22,11 +45,12 @@ router.post('/create',(req,res)=>{
     });
 });
 
-router.get('/get',(req,res)=>{
+router.get('/get',async (req,res)=>{
     try{
         const categories = await Category.find({});
         if(categories){
-            return res.status(200).send(categories);
+            const categoryList = createCategories(categories);
+            return res.status(200).send(categoryList);
         }
     }catch(err){
         return res.status(500).send("Server error"); //Internal server error
