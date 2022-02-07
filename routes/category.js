@@ -2,8 +2,25 @@ const {Category} = require("../models/category");
 const {auth} = require("../middleware/auth");
 const {admin} = require("../middleware/admin");
 const slugify = require('slugify');
+
+const multer = require('multer');
+
+const shortid = require('shortid');
+const path = require('path');
+
 const express = require("express");
 const router = express.Router();
+
+const storage = multer.diskStorage({
+    destination: function (req,file,cb){
+        cb(null,path.join(path.dirname(__dirname),'uploads'))
+    },
+    filename: function(req,file,cb){
+        cb(null,shortid.generate()+"-"+file.originalname)
+    }
+});
+
+const upload = multer({storage});
 
 function createCategories(categories,parentId = null){
     const categoryList = [];
@@ -26,11 +43,17 @@ function createCategories(categories,parentId = null){
     return categoryList;
 }
 
-router.post('/create',[auth,admin],async (req,res)=>{
+router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res)=>{
+
     const categoryObj = {
         name: req.body.name,
         slug: slugify(req.body.name)
     }
+
+    if(req.file){
+        categoryObj.categoryImage = "http://localhost:3000/public/"+req.file.filename;
+    }
+
     if(req.body.parentId){
         categoryObj.parentId = req.body.parentId;
     }

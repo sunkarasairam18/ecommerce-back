@@ -11,32 +11,33 @@ router.post('/add',[auth,user],async (req,res)=>{
         if(result){
             const product = req.body.cartItems.product;
             const item = result.cartItems.find(c => c.product == product);
+            let condition,update;
             if(item){
-                Cart.findOneAndUpdate({"user": req.user._id,"cartItems.product":product},{
+                condition = {"user": req.user._id,"cartItems.product":product};
+                update = {
                     "$set":{
                         "cartItems.$": {
                             ...req.body.cartItems,
                             quantity: item.quantity + req.body.cartItems.quantity
                         }
                     }
-                },(error,_cart)=>{
-                    if(error) return res.status(400).json({error});
-                    if(_cart){
-                        return res.status(201).json({_cart});
-                    }
-                });
+                }
+                
             }else{
-                Cart.findOneAndUpdate({user: req.user._id},{
+                condition = {"user": req.user._id};
+                update = {
                     "$push":{
                         "cartItems": req.body.cartItems
                     }
-                },(error,_cart)=>{
-                    if(error) return res.status(400).json({error});
-                    if(_cart){
-                        return res.status(201).json({cart});
-                    }
-                });
+                };              
             }
+            Cart.findOneAndUpdate(condition,update,(error,_cart)=>{
+                if(error) return res.status(400).json({error});
+                if(_cart){
+                    return res.status(201).json({_cart});
+                }
+            });
+            
         }else{
             const cart = new Cart({
                 user: req.user._id,
