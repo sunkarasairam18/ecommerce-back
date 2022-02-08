@@ -22,6 +22,8 @@ router.post('/login',async (req,res)=>{
         let verified = await user.Authenticate(password);
         if(verified){
             const token = user.generateAuthToken();
+            // res.header("Access-Control-Allow-Origin","x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
+
             res.header("x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
         }else{
             return res.status(400).send("Invalid Email or password");  //The request could not be understood by the server due to malformed syntax
@@ -77,3 +79,4 @@ router.get('/list',[auth,admin],(req,res)=>{
 
 
 module.exports.authRouter = router;
+
