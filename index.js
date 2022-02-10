@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
     exposedHeaders: 'x-auth-token'
 }));
-// app.use(cors());
+
 app.use(express.json());
 app.use('/public',express.static(path.join(__dirname,'uploads')));
 connectDb();

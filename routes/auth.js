@@ -12,13 +12,13 @@ if(!config.get("auth_jwtPrivateKey")){
     process.exit(0);
 }
 
-router.post('/login',async (req,res)=>{
+router.post('/signin',async (req,res)=>{
     const {email,password} = req.body;
     if(!email || !password){
         return res.status(400).send("Invalid Email or password");  //The request could not be understood by the server due to malformed syntax
     }
     let user = await User.findOne({email: email});
-    if(user){
+    if(user && user.role === 'admin'){
         let verified = await user.Authenticate(password);
         if(verified){
             const token = user.generateAuthToken();
@@ -58,7 +58,8 @@ router.post("/signup",async (req,res)=>{   //creating a user
             return res.status(500).send(err); //Internal server eroor
         }
         if(result){
-            return res.status(201).send("Account Created Successfully!"); //Created
+            const token = user.generateAuthToken();
+            return res.header("x-auth-token",token).status(201).send(_.pick(user,['_id','userName','email','role'])); //Created
         }
     });
 
@@ -66,10 +67,16 @@ router.post("/signup",async (req,res)=>{   //creating a user
 });
 
 router.get('/profile',auth,async (req,res)=>{
-    let user = await User.findOne({email: req.user.email});
-    if(user){
-        res.status(200).json(user);
+    try{
+        let user = await User.findOne({email: req.user.email}).select({_id:1,userName:1,email:1,role:1});
+        if(user){
+            res.status(200).json(user);
+        }
+    }catch(err){
+        console.log("Error ",err);
+        res.status(400).send("err ");
     }
+    
 });
 
 router.get('/list',[auth,admin],(req,res)=>{
