@@ -2,6 +2,7 @@ const {Category} = require("../models/category");
 const {auth} = require("../middleware/auth");
 const {admin} = require("../middleware/admin");
 const slugify = require('slugify');
+const {io} = require('../sockets');
 
 const multer = require('multer');
 
@@ -43,6 +44,16 @@ function createCategories(categories,parentId = null){
     return categoryList;
 }
 
+const categoryStream = Category.watch();
+categoryStream.on('change',async (change)=>{
+    const categories = await Category.find({});
+    if(categories){
+        const categoryList = createCategories(categories);
+        io.emit("categories_change",categoryList);
+        console.log("emitting...");
+    }
+});
+
 router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res)=>{
 
     const categoryObj = {
@@ -68,17 +79,18 @@ router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res
     });
 });
 
-router.get('/get',async (req,res)=>{
-    try{
-        const categories = await Category.find({});
-        if(categories){
-            const categoryList = createCategories(categories);
-            return res.status(200).send(categoryList);
-        }
-    }catch(err){
-        return res.status(500).send("Server error"); //Internal server error
-    }
+// router.get('/get',async (req,res)=>{
+//     try{
+//         const categories = await Category.find({});
+//         if(categories){
+//             const categoryList = createCategories(categories);
+//             return res.status(200).send(categoryList);
+//         }
+//     }catch(err){
+//         return res.status(500).send("Server error"); //Internal server error
+//     }
 
-});
+// });
+
 
 module.exports.categoryRouter = router;

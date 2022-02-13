@@ -18,6 +18,7 @@ const connectDB = async () =>{
     connect(URI)
     .then(()=>{
         console.log('Connected to Mongodb');
+        
     }).catch((err) => {
         console.error('Cannot Connected to Database',err);
         return process.exit(0);
