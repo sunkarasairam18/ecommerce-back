@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 router.post('/create',[auth,admin],upload.array('productPicture'), async (req,res)=>{
-    const {name,price,description,category,quantity,createdBy} = req.body;
+    const {name,price,description,category,quantity} = req.body;
 
     let productPictures = [];
 

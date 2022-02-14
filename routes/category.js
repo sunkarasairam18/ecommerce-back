@@ -47,10 +47,9 @@ function createCategories(categories,parentId = null){
 const categoryStream = Category.watch();
 categoryStream.on('change',async (change)=>{
     const categories = await Category.find({});
-    if(categories){
+    if(categories && categories.length>0){
         const categoryList = createCategories(categories);
-        io.emit("categories_change",categoryList);
-        console.log("emitting...");
+        io.emit("categories_change",'changed');        
     }
 });
 
@@ -79,18 +78,18 @@ router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res
     });
 });
 
-// router.get('/get',async (req,res)=>{
-//     try{
-//         const categories = await Category.find({});
-//         if(categories){
-//             const categoryList = createCategories(categories);
-//             return res.status(200).send(categoryList);
-//         }
-//     }catch(err){
-//         return res.status(500).send("Server error"); //Internal server error
-//     }
+router.get('/get',async (req,res)=>{
+    try{
+        const categories = await Category.find({});
+        if(categories){
+            const categoryList = createCategories(categories);
+            return res.status(200).send(categoryList);
+        }
+    }catch(err){
+        return res.status(500).send("Server error"); //Internal server error
+    }
 
-// });
+});
 
 
 module.exports.categoryRouter = router;
