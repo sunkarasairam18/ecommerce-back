@@ -46,11 +46,7 @@ function createCategories(categories,parentId = null){
 
 const categoryStream = Category.watch();
 categoryStream.on('change',async (change)=>{
-    const categories = await Category.find({});
-    if(categories && categories.length>0){
-        const categoryList = createCategories(categories);
-        io.emit("categories_change",'changed');        
-    }
+    io.emit("categories_change",'changed');        
 });
 
 router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res)=>{
