@@ -61,7 +61,8 @@ productStream.on('change',async (change)=>{
 router.get('/get',[auth,admin],async (req,res)=>{
     try{
         const products = await Product.find({})
-        .select({_id:1,name:1,price:1,quantity:1,description:1,category:1});
+        .select({_id:1,name:1,price:1,quantity:1,description:1,category:1,productPictures:1})
+        .populate("category","_id name");
         
         if(products){
             return res.status(200).send(products);
