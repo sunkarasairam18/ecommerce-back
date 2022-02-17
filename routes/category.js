@@ -88,5 +88,17 @@ router.get('/get',async (req,res)=>{
 
 });
 
+router.get('/getname/:id',async (req,res)=>{
+    try{
+        const {id} = req.params;
+        if(id){
+            const out = await Category.findOne({_id: id}).select({name:1});
+            return res.status(200).send(out);
+        }
+    }catch(err){
+        return res.status(500).send("Server error"); //Internal server error
+    }
+});
+
 
 module.exports.categoryRouter = router;

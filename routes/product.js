@@ -10,6 +10,7 @@ const slugify = require('slugify');
 const {auth} = require('../middleware/auth');
 const {admin} = require('../middleware/admin');
 const {Product} = require('../models/product');
+const {Category} = require('../models/category');
 
 const storage = multer.diskStorage({
     destination: function (req,file,cb){
@@ -70,6 +71,29 @@ router.get('/get',[auth,admin],async (req,res)=>{
     }catch(err){
         return res.status(500).send("Server error"); //Internal server error
     }
+});
+
+router.get('/get/:slug',async (req,res)=>{
+    try{
+        const {slug} = req.params;
+        const category = await Category.findOne({slug: slug}).select({_id:1});
+        if(category){
+            try{
+
+                const products = await Product.find({category: category._id}).limit(30).sort({createdAt:-1});
+                if(products){
+                    res.status(200).send(products);
+                }
+            }catch(err){
+                res.status(500).send("Server error"); //Internal server error
+            }
+
+
+        }
+    }catch(err){
+        res.status(500).send("Server error"); //Internal server error
+    }
+
 });
 
 
