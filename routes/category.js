@@ -3,6 +3,7 @@ const {auth} = require("../middleware/auth");
 const {admin} = require("../middleware/admin");
 const slugify = require('slugify');
 const {io} = require('../sockets');
+const mongoose = require('mongoose');
 
 const multer = require('multer');
 
@@ -51,16 +52,13 @@ categoryStream.on('change',async (change)=>{
 });
 
 router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res)=>{
-
     const categoryObj = {
         name: req.body.name,
         slug: slugify(req.body.name)
     }
-
     if(req.file){
         categoryObj.categoryImage = "http://localhost:3000/public/"+req.file.filename;
     }
-
     if(req.body.parentId){
         categoryObj.parentId = req.body.parentId;
     }
@@ -96,6 +94,51 @@ router.get('/getname/:id',async (req,res)=>{
             return res.status(200).send(out);
         }
     }catch(err){
+        return res.status(500).send("Server error"); //Internal server error
+    }
+});
+
+router.post('/update',[auth,admin],upload.array('categoryImage'),async (req,res) =>{
+    const {_id,name,parentId,type} = req.body;
+    const updatedCategories = [];
+    try{
+ 
+    
+    if(name instanceof Array){
+        for(let i = 0;i<name.length;i++){
+            const category = {
+                name: name[i],
+                slug: slugify(name[i]),
+                type: type[i]
+            };
+            if(parentId[i] !== ""){
+                category.parentId = parentId[i];
+
+            }
+            const updated = await Category.findOneAndUpdate({_id: _id[i]},category,{new: true}).then(result=>{
+                
+            }).catch(err=>{
+                console.log("error from catch ",category);
+            });
+            updatedCategories.push(updated);
+            
+
+        }     
+        return res.status(200).send();  //Ok
+    }else{
+        const category = {
+            name,
+            type
+        };
+        if(parentId !== ""){
+            category.parentId = parentId;
+            const updated = await Category.findOneAndUpdate({_id},category,{new: true});
+            return res.status(200).send(updated);    //Ok
+        }
+    }
+    }
+    catch(err){
+        console.log(err.message);
         return res.status(500).send("Server error"); //Internal server error
     }
 });
