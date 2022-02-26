@@ -134,6 +134,8 @@ router.post('/update',[auth,admin],upload.array('categoryImage'),async (req,res)
             category.parentId = parentId;
             const updated = await Category.findOneAndUpdate({_id},category,{new: true});
             return res.status(200).send(updated);    //Ok
+        }else{
+            return res.status(500).send("Server error"); //Internal server error
         }
     }
     }
@@ -141,6 +143,24 @@ router.post('/update',[auth,admin],upload.array('categoryImage'),async (req,res)
         console.log(err.message);
         return res.status(500).send("Server error"); //Internal server error
     }
+});
+
+
+router.post('/delete',async (req,res)=>{
+    try{
+        const {ids} = req.body.payload;
+        const deletedCategories = [];
+        for(let i = 0;i<ids.length;i++){
+            const deleteCategory = await Category.findOneAndDelete({_id: ids[i]._id});
+            deletedCategories.push(deleteCategory);
+        }
+        if(deletedCategories.length === ids.length){
+            res.status(200).send("Categories Deleted");
+        }
+    }catch(err){
+        return res.status(500).send("Server error"); //Internal server error
+    }
+    
 });
 
 
