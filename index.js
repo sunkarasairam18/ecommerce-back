@@ -2,6 +2,7 @@ const {authRouter} = require("./routes/auth");
 const {categoryRouter} = require("./routes/category"); 
 const {cartRouter} = require('./routes/cart');
 const {productRouter} = require("./routes/product");
+const {pageRouter} = require("./routes/page");
 const {app,httpServer} = require('./sockets');
 const express = require('express');
 
@@ -22,6 +23,7 @@ app.use("/category",categoryRouter);
 app.use("/product",productRouter);
 app.use("/user",authRouter);
 app.use("/cart",cartRouter);
+app.use("/page",pageRouter);
 
 app.get("/",(req,res)=>{
     res.status(200).send("Hello World!");

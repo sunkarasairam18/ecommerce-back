@@ -1,3 +1,4 @@
 {
-    "name": "App in default stage"
+    "name": "App in default stage",
+    "admin_url": "http://localhost:3001"
 }
