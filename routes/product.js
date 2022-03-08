@@ -67,6 +67,8 @@ router.get('/get',[auth,admin],async (req,res)=>{
         
         if(products){
             return res.status(200).send(products);
+        }else{
+            res.status(400).send("Products not found");
         }
     }catch(err){
         return res.status(500).send("Server error"); //Internal server error

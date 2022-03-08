@@ -10,7 +10,6 @@ const shortid = require('shortid');
 router.post('/create',[auth,admin],upload.fields([{name:"banners"},{name:"products"}]),async (req,res)=>{
     try{
         const {banners,products} = req.files;
-        console.log(banners,products);
         if(banners && banners.length>0){
             req.body.banners = banners.map((banner,index)=>({
                 img : `${config.get("admin_url")}/public/${banner.filename}`,
@@ -25,22 +24,47 @@ router.post('/create',[auth,admin],upload.fields([{name:"banners"},{name:"produc
         }
 
         req.body.createdBy = req.user._id;
-        // res.send(req.body);
-        const page = new Page(req.body);
-        page.save((err,page)=>{
-            if(err){
-                return res.status(500).send(err);
-            }
 
-            if(page){
-                return res.status(201).send({page}); //New Resource created successfully
-            }
-           
-            
-        });
+        const pageExists = await Page.findOne({category: req.body.category});
+        if(pageExists){
+            Page.findOneAndUpdate({category: req.body.category},req.body).then(
+                ()=>{
+                    return res.status(205).send({page}); //Reset content
+                }
+            ).catch(()=>{
+                return res.status(500).send(err); //Internal server error
+            });
+        }else{
+            const page = new Page(req.body);
+            page.save((err,page)=>{
+                if(err){
+                    return res.status(500).send(err);
+                }
+    
+                if(page){
+                    return res.status(201).send({page}); //New Resource created successfully
+                }
+               
+                
+            });
+        }
+        
     }catch(err){
         console.log(err);
         return res.status(500).send(err); //Internal server error
+    }
+});
+
+router.get('/:category/:type',async (req,res)=>{
+    try{
+        const {category,type} = req.params;
+        const page = await Page.findOne({category:category});
+        if(page){
+            return res.status(200).send({page});
+    
+        }
+    }catch(err){
+        return res.status(400).send({err});
     }
 });
 
