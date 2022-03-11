@@ -33,6 +33,31 @@ router.post('/signin',async (req,res)=>{
     }
 });
 
+router.post('/role/signin',async (req,res)=>{
+    const {email,password} = req.body;
+    if(!email || !password){
+        return res.status(400).send("Invalid Email or password");  //The request could not be understood by the server due to malformed syntax
+    }
+    try{
+        let user = await User.findOne({email: email});
+        if(user && user.role === 'user'){
+            let verified = await user.Authenticate(password);
+            if(verified){
+                const token = user.generateAuthToken();
+                // res.header("Access-Control-Allow-Origin","x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
+
+                res.header("x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
+            }else{
+                return res.status(401).send("Unauthorized");  
+            }
+        }else{
+            return res.status(403).send("Forbidden");  //The server understood the request, but is refusing to fulfill it
+        }
+    }catch(err){
+        return res.status(500).send("Internal Server Error"); //Internal server error
+    }
+});
+
 router.post("/signup",async (req,res)=>{   //creating a user
     const {error} = validateUser(req.body);
     if(error){
