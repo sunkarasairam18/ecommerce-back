@@ -64,7 +64,7 @@ router.post("/signup",async (req,res)=>{   //creating a user
         return res.status(403).send(error.details[0].message);   //Forbidden request
     }
     let user = await User.findOne({email: req.body.email});
-    if(user) return res.status(403).send(`${req.body.role} already registered`);   //Forbidden request
+    if(user) return res.status(403).send(`existed`);   //Forbidden request
     const {fullName,userName,email,password,contactNumber,role} = req.body;
     const salt = await bcrypt.genSalt(10);
     const hash_password = await bcrypt.hash(password.trim(),salt);
