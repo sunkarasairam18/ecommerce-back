@@ -68,7 +68,7 @@ router.get('/get',[auth,admin],async (req,res)=>{
         if(products){
             return res.status(200).send(products);
         }else{
-            res.status(400).send("Products not found");
+            res.status(400).send("Products not found"); //Bad Request
         }
     }catch(err){
         return res.status(500).send("Server error"); //Internal server error
@@ -96,6 +96,25 @@ router.get('/get/:slug',async (req,res)=>{
         res.status(500).send("Server error"); //Internal server error
     }
 
+});
+
+router.get("/info/:productId",async (req,res)=>{
+    // .select({_id:1,userName:1,email:1,role:1})
+    try{
+        const { productId } = req.params;
+        if(productId){
+            let user = await Product.findOne({_id: productId});
+            if(user){
+                res.status(200).json(user);
+            }else{
+                res.status(404).send("Product not found"); // server did not find a current representation for the target resource 
+            }
+        }else{
+            res.status(400).send("Params Required"); //Bad Request
+        }
+    }catch(err){        
+        return res.status(500).send(err); //Internal server eroor
+    }
 });
 
 
