@@ -87,6 +87,26 @@ router.get('/get',async (req,res)=>{
 
 });
 
+router.get('/getroute/:catId',async (req,res)=>{
+    try{
+        const {catId} = req.params;
+        if(catId){
+            let routelist = [];
+            var category = await Category.findOne({_id: catId}).select({name:1,parentId:1});
+            routelist.unshift(category.name);
+            while(category.parentId){
+                category = await Category.findOne({_id: category.parentId}).select({name:1,parentId:1});
+                routelist.unshift(category.name);
+            }
+            return res.status(200).send(routelist);  //Succeded
+        }else{
+            return res.status(400).send("catId is Missing"); //Bad Request
+        }
+    }catch(err){
+        return res.status(500).send(err);
+    }
+}); 
+
 router.get('/getname/:id',async (req,res)=>{
     try{
         const {id} = req.params;
