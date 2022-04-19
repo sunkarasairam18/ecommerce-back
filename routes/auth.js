@@ -7,6 +7,8 @@ const router = express.Router();
 const {User,validateUser} = require('../models/auth');
 const bcrypt = require("bcrypt");
 
+const { Cart } = require('../models/cart');
+
 if(!config.get("auth_jwtPrivateKey")){
     console.log("JWT Private Key is not defined");
     process.exit(0);
@@ -45,8 +47,11 @@ router.post('/role/signin',async (req,res)=>{
             if(verified){
                 const token = user.generateAuthToken();
                 // res.header("Access-Control-Allow-Origin","x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
-
-                res.header("x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
+                let final = {};
+                let cart = await Cart.findOne({user: user._id}).select({cartItems: 1});
+                final = {...user._doc,'cartCount': cart.cartItems.length};
+                res.header("x-auth-token",token).status(200).send(_.pick(final,['_id','userName','email','role','cartCount'])); //ok status code
+                
             }else{
                 return res.status(401).send("Unauthorized");  
             }
@@ -95,7 +100,11 @@ router.get('/profile',auth,async (req,res)=>{
     try{
         let user = await User.findOne({email: req.user.email}).select({_id:1,userName:1,email:1,role:1});
         if(user){
-            res.status(200).json(user);
+            let final = {};
+            let cart = await Cart.findOne({user: req.user._id}).select({cartItems: 1});
+            final = {...user._doc,'cartCount': cart.cartItems.length};
+            // console.log(final,cart.cartItems.length);
+            res.status(200).json(final);
         }
     }catch(err){
         console.log("Error ",err);
