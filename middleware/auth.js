@@ -12,7 +12,7 @@ exports.auth = function(req,res,next){
         req.user = decoded;
         next();
     }catch(err){
-        return res.stats(400).send("Invalid token.");
+        return res.status(400).send("Invalid token.");
     }
 }
 

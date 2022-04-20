@@ -1,6 +1,7 @@
-const {authRouter} = require("./routes/auth");
-const {categoryRouter} = require("./routes/category"); 
-const {cartRouter} = require('./routes/cart');
+const { authRouter } = require("./routes/auth");
+const { categoryRouter } = require("./routes/category"); 
+const { cartRouter } = require('./routes/cart');
+const { addressRouter } = require('./routes/address');
 const {productRouter} = require("./routes/product");
 const {pageRouter} = require("./routes/page");
 const {app,httpServer} = require('./sockets');
@@ -23,6 +24,7 @@ app.use("/category",categoryRouter);
 app.use("/product",productRouter);
 app.use("/user",authRouter);
 app.use("/cart",cartRouter);
+app.use('/address',addressRouter);
 app.use("/page",pageRouter);
 
 app.get("/",(req,res)=>{

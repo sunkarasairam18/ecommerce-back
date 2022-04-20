@@ -65,13 +65,17 @@ router.post('/add',[auth,user],(req,res)=>{
                     }
                 };              
             }
-            Cart.findOneAndUpdate(condition,update,(error,_cart)=>{
+            Cart.findOneAndUpdate(condition,update,{new: true},(error,_cart)=>{
                 if(error) return res.status(400).json({error});
                 if(_cart){
-                    Cart.findOne({user: req.user._id},(err,result)=>{
-                        if(err) res.status(500).send(err); //Internal Server error
-                        if(result) return res.status(201).json(result.cartItems); //Created
+                    // Cart.findOne({user: req.user._id},(err,result)=>{
+                    //     if(err) res.status(500).send(err); //Internal Server error
+                    //     if(result) return res.status(201).json(result.cartItems); //Created
+                    // });
+                    let list = _cart.cartItems.filter(function(item){
+                        return item.product !== product;
                     });
+                    return res.status(201).json(list[0]);
                 }
             });
             
@@ -86,7 +90,7 @@ router.post('/add',[auth,user],(req,res)=>{
                     return res.status(500).send(err); //Internal server eroor
                 }
                 if(result){
-                    return res.status(201).send(result.cartItems); //Created
+                    return res.status(201).send(result.cartItems[0]); //Created
                 }
             });
         }
@@ -117,10 +121,11 @@ router.post('/delitem',[auth,user],(req,res)=>{
             Cart.findOneAndUpdate(condition,update,(error,_cart)=>{
                 if(error) return res.status(400).json({error});
                 if(_cart){
-                    Cart.findOne({user: req.user._id},(err,result)=>{
-                        if(err) res.status(500).send(err); //Internal Server error
-                        if(result) return res.status(201).json(result.cartItems); //Created
-                    });
+                    // Cart.findOne({user: req.user._id},(err,result)=>{
+                    //     if(err) res.status(500).send(err); //Internal Server error
+                    //     if(result) return res.status(201).json(result.cartItems); //Created
+                    // });
+                    return res.status(201).send(item);
                 }
             });
             
