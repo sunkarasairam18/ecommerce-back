@@ -1,5 +1,6 @@
 const config = require('config');
 const {auth} = require('../middleware/auth');
+const { user } = require('../middleware/user');
 const {admin} = require('../middleware/admin');
 const _ = require('lodash');
 const express = require("express");
@@ -32,6 +33,76 @@ router.post('/signin',async (req,res)=>{
         }
     }else{
         return res.status(400).send("Invalid Email or password");  //The request could not be understood by the server due to malformed syntax
+    }
+});
+
+router.post('/account/update',[auth, user], async (req,res)=>{
+    try{
+        const user = await User.findById(req.user._id);
+        if(user){
+
+            const {fullName,userName,email,contactNumber,oldPwd,newPwd} = req.body;
+            let condition = {"user": req.user._id},update;
+            if(newPwd){
+                
+                let verified = await user.Authenticate(oldPwd);
+                if(verified){
+                    // const {fullName,userName,email,password,contactNumber,role} = req.body;
+                    const salt = await bcrypt.genSalt(10);
+                    const hash_password = await bcrypt.hash(newPwd.trim(),salt);
+                    
+                    update = {
+                        "$set":{
+                            "fullName": fullName,
+                            "userName": userName,
+                            "email": email,
+                            "contactNumber": contactNumber,
+                            "hash_password": hash_password
+                        }
+                    };
+                    
+                }else return res.status(403).send("Forbidden"); //The server understood the request but refuses to authorize it.
+            }else{
+                update = {
+                    "$set":{
+                        "fullName": fullName,
+                        "userName": userName,
+                        "email": email,
+                        "contactNumber": contactNumber,
+                    }
+                };
+            }
+            User.findOneAndUpdate(condition,update,{new: true},(error,user)=>{
+                if(error) return res.status(400).json({error});
+                if(user){                    
+                    const token = user.generateAuthToken();
+                    let updated = {
+                        _id: user._id,
+                        userName: user.userName,
+                        email: user.email,
+                        role: user.role,
+                        token: token
+                    };
+                    return res.status(200).send(updated);
+                }
+            });
+    
+        }else return res.status(404).send("User not found");
+
+    }catch(err){
+        return res.status(500).send(err); //Internal server error
+    }
+});
+
+router.get('/fullprofile',[auth,user],async (req,res)=>{
+    try{
+        const user = await User.findById(req.user._id);
+        if(user){
+            return res.status(200).send(user);
+            
+        }else return res.status(404).send("User not found");
+    }catch(err){
+        return res.status(500).send(err) //Internal Server error
     }
 });
 

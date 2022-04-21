@@ -30,14 +30,6 @@ router.get('/get',[auth,user],async (req,res)=>{
     return res.status(404).send("Cart Not Found");
 }); 
 
-// router.get('/cartcount',[auth,user],async (req,res)=>{
-//     const usercart = await Cart.findOne({user: req.user._id}).select({cartItems:1});
-//     if(usercart){
-//         return res.status(200).json({count:usercart.cartItems.length});
-//     }
-//     return res.status(404).send("Cart Not Found");
-// }); 
-
 router.post('/add',[auth,user],(req,res)=>{
 
     Cart.findOne({user:req.user._id},(err,result)=>{
@@ -67,11 +59,7 @@ router.post('/add',[auth,user],(req,res)=>{
             }
             Cart.findOneAndUpdate(condition,update,{new: true},(error,_cart)=>{
                 if(error) return res.status(400).json({error});
-                if(_cart){
-                    // Cart.findOne({user: req.user._id},(err,result)=>{
-                    //     if(err) res.status(500).send(err); //Internal Server error
-                    //     if(result) return res.status(201).json(result.cartItems); //Created
-                    // });
+                if(_cart){                    
                     let list = _cart.cartItems.filter(function(item){
                         return item.product !== product;
                     });
@@ -121,10 +109,7 @@ router.post('/delitem',[auth,user],(req,res)=>{
             Cart.findOneAndUpdate(condition,update,(error,_cart)=>{
                 if(error) return res.status(400).json({error});
                 if(_cart){
-                    // Cart.findOne({user: req.user._id},(err,result)=>{
-                    //     if(err) res.status(500).send(err); //Internal Server error
-                    //     if(result) return res.status(201).json(result.cartItems); //Created
-                    // });
+                    
                     return res.status(201).send(item);
                 }
             });
