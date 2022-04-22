@@ -16,6 +16,22 @@ router.get('/get',[auth,user],async (req,res)=>{
     }
 });
 
+router.get('/get/selectd',[auth,user],async (req,res)=>{
+    try{
+        const address = await Address.findOne({user: req.user._id});
+        if(address){
+            const selected = address.AddressList.find(c => c._id == address.selected);
+            if(selected){
+                return res.status(200).send(selected);
+
+            }else return res.status(404).send("Nothing Selected");
+        }
+    }catch(err){
+        return res.status(500).send(err); //Internal Server error
+
+    }
+});
+
 router.post('/add',[auth, user],async (req,res)=>{
     try{
         const address = await Address.findOne({user: req.user._id});
@@ -60,6 +76,7 @@ router.post('/add',[auth, user],async (req,res)=>{
         }else{
             const new_address = new Address({
                 user: req.user._id,
+                selected: "",
                 AddressList: [req.body.address]
             });
             
@@ -68,7 +85,18 @@ router.post('/add',[auth, user],async (req,res)=>{
                     return res.status(500).send(err); //Internal server eroor
                 }
                 if(result){
-                    return res.status(201).send(result.AddressList); //Created
+                    Address.findOneAndUpdate({"user": req.user._id},{
+                        "$set":{
+                            "selected": result.AddressList[0]._id  
+                        }
+                    },{new: true},(error,_address)=>{
+                        if(error) return res.status(400).json({error});
+                        if(_address){
+                            
+                            return res.status(201).json(_address.AddressList); //Created and selected as default
+                        }
+                    });
+                    // return res.status(201).send(result.AddressList); //Created
                 }
             });
         }
