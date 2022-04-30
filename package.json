@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/sunkarasairam18/ecommerce-back#readme",
   "dependencies": {
+    "aws-sdk": "^2.1125.0",
     "bcrypt": "^5.0.1",
     "config": "^3.3.7",
     "cors": "^2.8.5",
@@ -27,8 +28,10 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.1.8",
     "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
     "shortid": "^2.2.16",
     "slugify": "^1.6.5",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2"
   }
 }

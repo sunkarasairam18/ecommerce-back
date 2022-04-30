@@ -3,11 +3,11 @@ const config = require('config');
 
 if(!config.get("db.password")){
     console.log("Password Environment variable not defined");
-    return process.exit(0);
+    process.exit(0);
 }
 if(!config.get("db.username")){
     console.log("Username Environment variable not defined");
-    return process.exit(0);
+    process.exit(0);
 }
 
 const URI = `mongodb+srv://${config.get("db.username")}:${config.get("db.password")}@cluster0.ct1mu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;

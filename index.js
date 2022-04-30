@@ -5,6 +5,7 @@ const { addressRouter } = require('./routes/address');
 const {productRouter} = require("./routes/product");
 const {pageRouter} = require("./routes/page");
 const {app,httpServer} = require('./sockets');
+const { getImage } = require("./s3");
 const express = require('express');
 
 const connectDb = require('./connection');
@@ -17,7 +18,12 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use('/public',express.static(path.join(__dirname,'uploads')));
+// app.use('/public',express.static(path.join(__dirname,'uploads')));
+// app.get('/public/:key',async (req,res)=>{
+//     const key = req.params.key;
+//     const readStream = await getImage(key);
+//     readStream.pipe(res);
+// });
 connectDb();
 
 app.use("/category",categoryRouter);

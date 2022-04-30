@@ -4,6 +4,10 @@
         "username":"e_db_username",
         "password":"e_db_password"
     },
-    "aws_bucket_name":"bucket_name",
-    "aws_region":"bucket_region"
+    "aws":{
+        "bucket_name": "bucket_name",
+        "region": "region",
+        "access_id": "access_id",
+        "secret_key": "secret_key"
+    }
 }

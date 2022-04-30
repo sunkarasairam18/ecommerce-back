@@ -12,16 +12,24 @@ const {admin} = require('../middleware/admin');
 const {Product} = require('../models/product');
 const {Category} = require('../models/category');
 
-const storage = multer.diskStorage({
-    destination: function (req,file,cb){
-        cb(null,path.join(path.dirname(__dirname),'uploads'))
-    },
-    filename: function(req,file,cb){
-        cb(null,shortid.generate()+"-"+file.originalname)
-    }
-});
+const {upload,getImage} = require('../s3');
 
-const upload = multer({storage});
+// const storage = multer.diskStorage({
+//     destination: function (req,file,cb){
+//         cb(null,path.join(path.dirname(__dirname),'uploads'))
+//     },
+//     filename: function(req,file,cb){
+//         cb(null,shortid.generate()+"-"+file.originalname)
+//     }
+// });
+
+// const upload = multer({storage});
+
+// router.get('/images/:key',async (req,res)=>{
+//     const key = req.params.key;
+//     const readStream = await getImage(key);
+//     readStream.pipe(res);
+// });
 
 router.post('/create',[auth,admin],upload.array('productPicture'), async (req,res)=>{
     const {name,price,description,category,quantity} = req.body;
@@ -30,9 +38,11 @@ router.post('/create',[auth,admin],upload.array('productPicture'), async (req,re
 
     if(req.files.length>0){
         productPictures = req.files.map(file => {
-            return {img: file.filename}
+            return {img: file.key}
         });
     }
+    // return res.send(req.files);
+
 
     const product = new Product({
         name: name,
@@ -50,7 +60,7 @@ router.post('/create',[auth,admin],upload.array('productPicture'), async (req,re
         if(result){
             res.status(201).json({product});
         }
-    })
+    });
 });
 
 const productStream = Product.watch();
