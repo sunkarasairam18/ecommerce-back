@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
 const { io } = require("../sockets");
-
-const shortid = require('shortid');
-const path = require('path');
 const slugify = require('slugify');
 
 const {auth} = require('../middleware/auth');
@@ -12,24 +8,8 @@ const {admin} = require('../middleware/admin');
 const {Product} = require('../models/product');
 const {Category} = require('../models/category');
 
-const {upload,getImage} = require('../s3');
+const {upload} = require('../middleware/s3');
 
-// const storage = multer.diskStorage({
-//     destination: function (req,file,cb){
-//         cb(null,path.join(path.dirname(__dirname),'uploads'))
-//     },
-//     filename: function(req,file,cb){
-//         cb(null,shortid.generate()+"-"+file.originalname)
-//     }
-// });
-
-// const upload = multer({storage});
-
-// router.get('/images/:key',async (req,res)=>{
-//     const key = req.params.key;
-//     const readStream = await getImage(key);
-//     readStream.pipe(res);
-// });
 
 router.post('/create',[auth,admin],upload.array('productPicture'), async (req,res)=>{
     const {name,price,description,category,quantity} = req.body;

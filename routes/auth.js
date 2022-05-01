@@ -173,7 +173,7 @@ router.get('/profile',auth,async (req,res)=>{
         if(user){
             let final = {};
             let cart = await Cart.findOne({user: req.user._id}).select({cartItems: 1});
-            final = {...user._doc,'cartCount': cart.cartItems.length};
+            final = {...user._doc,'cartCount': cart?cart.cartItems.length:0};
             // console.log(final,cart.cartItems.length);
             res.status(200).json(final);
         }

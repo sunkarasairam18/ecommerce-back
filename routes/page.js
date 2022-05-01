@@ -5,7 +5,6 @@ const {upload} = require('../middleware/upload');
 const {Page} = require("../models/page");
 const { auth } = require('../middleware/auth');
 const {admin} = require("../middleware/admin");
-const shortid = require('shortid');
 
 router.post('/create',[auth,admin],upload.fields([{name:"banners"},{name:"products"}]),async (req,res)=>{
     try{
