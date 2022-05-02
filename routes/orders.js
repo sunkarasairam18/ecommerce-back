@@ -41,7 +41,7 @@ router.get("/get",[auth,user],async (req,res)=>{
                 var items = [...orders[j]._doc.orderedItems];
                 // console.log(j,optOrder);
                 for(let k = 0;k<items.length;k++){
-                    let product = await Product.findOne({_id: items[k].product}).select({name:1,price:1,slug:1});
+                    let product = await Product.findOne({_id: items[k].product}).select({name:1,price:1,slug:1,productPictures:1});
                     // optOrder.orderedItems[k] = {...optOrder.orderedItems[k],name:product.name,price: product.price,slug: product.slug}; 
                     if(product){
                         newObj = {
@@ -49,7 +49,8 @@ router.get("/get",[auth,user],async (req,res)=>{
                             quantity: optOrder.orderedItems[k].quantity,
                             name: product.name,
                             price: product.price,
-                            slug: product.slug
+                            slug: product.slug,
+                            img: product.productPictures[0].img
                         };
                         listitems.push(newObj);
                         // optOrder.orderedItems[k]["name"] = product.name;
