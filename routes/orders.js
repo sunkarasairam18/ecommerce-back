@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Order } = require('../models/orders');
 const { Product } = require('../models/product');
+const { Cart } = require('../models/cart');
 
 const { user } = require('../middleware/user');
 const { auth } = require("../middleware/auth");
@@ -21,7 +22,10 @@ router.post("/create",[auth,user],async (req,res)=>{
             });   // Reduction in products quantity at warehouse is not done
             const saved = await order.save();
             if(saved){
-                res.status(200).send(saved);
+                let del = await Cart.deleteOne({user: req.user._id});
+                if(del){
+                    res.status(200).send(saved);
+                }
             }
         }catch(err){
             return res.status(500).json({err}); //Internal server error
