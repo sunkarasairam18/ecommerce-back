@@ -3,8 +3,8 @@ const {auth} = require("../middleware/auth");
 const {admin} = require("../middleware/admin");
 const slugify = require('slugify');
 const {io} = require('../sockets');
-const mongoose = require('mongoose');
-const {upload} = require('../middleware/upload');
+const {upload} = require('../middleware/s3');
+
 // const multer = require('multer');
 
 // const shortid = require('shortid');
@@ -52,13 +52,18 @@ categoryStream.on('change',async (change)=>{
     io.emit("categories_change",'changed');        
 });
 
-router.post('/create',[auth,admin],upload.single("categoryImage"),async (req,res)=>{
+router.post('/create',[auth,admin],upload.array("categoryImage"),async (req,res)=>{
     const categoryObj = {
         name: req.body.name,
         slug: slugify(req.body.name)
     }
-    if(req.file){
-        categoryObj.categoryImage = "http://localhost:3000/public/"+req.file.filename;
+    // if(req.files.length>0){
+    //     productPictures = req.files.map(file => {
+    //         return {img: file.key}
+    //     });
+    // }
+    if(req.files && req.files.length>0){
+        categoryObj.categoryImage = req.files[0].key;
     }
     if(req.body.parentId){
         categoryObj.parentId = req.body.parentId;
