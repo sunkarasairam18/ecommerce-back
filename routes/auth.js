@@ -120,7 +120,10 @@ router.post('/role/signin',async (req,res)=>{
                 // res.header("Access-Control-Allow-Origin","x-auth-token",token).status(200).send(_.pick(user,['_id','userName','email','role'])); //ok status code
                 let final = {};
                 let cart = await Cart.findOne({user: user._id}).select({cartItems: 1});
-                final = {...user._doc,'cartCount': cart.cartItems.length};
+                if(cart && cart.cartItems){
+                    final = {...user._doc,'cartCount': cart.cartItems.length};
+                }else final = {...user._doc,'cartCount': 0};
+                
                 res.header("x-auth-token",token).status(200).send(_.pick(final,['_id','userName','email','role','cartCount'])); //ok status code
                 
             }else{
@@ -130,6 +133,7 @@ router.post('/role/signin',async (req,res)=>{
             return res.status(403).send("Forbidden");  //The server understood the request, but is refusing to fulfill it
         }
     }catch(err){
+        console.log(err);
         return res.status(500).send("Internal Server Error"); //Internal server error
     }
 });
